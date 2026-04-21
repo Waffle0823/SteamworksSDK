@@ -106,6 +106,7 @@ endif()
 
 include(CMakePackageConfigHelpers)
 include(GNUInstallDirs)
+include(${CMAKE_CURRENT_LIST_DIR}/cmake/SteamworksSDKHelpers.cmake)
 
 set(_sw_runtime_files "")
 set(_sw_library_files "")
@@ -153,6 +154,7 @@ configure_package_config_file(
 install(FILES
     "${CMAKE_CURRENT_BINARY_DIR}/SteamworksSDKConfig.cmake"
     "${CMAKE_CURRENT_BINARY_DIR}/SteamworksSDKConfigVersion.cmake"
+    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/SteamworksSDKHelpers.cmake"
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/SteamworksSDK
 )
 
