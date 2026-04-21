@@ -5,13 +5,17 @@ endif()
 set(SWSDK_VERSION "164" CACHE STRING "Steamworks SDK version to download")
 set(SWSDK_LINK "https://partner.steamgames.com/downloads/steamworks_sdk_${SWSDK_VERSION}.zip" CACHE STRING "Steamworks SDK download link")
 
-if(NOT EXISTS ${CMAKE_BINARY_DIR}/external/steamworks_sdk_${SWSDK_VERSION}.zip)
+set(_swsdk_zip "${CMAKE_BINARY_DIR}/external/steamworks_sdk_${SWSDK_VERSION}.zip")
+
+if(NOT EXISTS ${_swsdk_zip})
     message(STATUS "Downloading SteamWorks SDK version ${SWSDK_VERSION} from ${SWSDK_LINK}")
+
+    set(_swsdk_zip_part "${_swsdk_zip}.part")
 
     file(
         DOWNLOAD
         ${SWSDK_LINK}
-        ${CMAKE_BINARY_DIR}/external/steamworks_sdk_${SWSDK_VERSION}.zip
+        ${_swsdk_zip_part}
         STATUS status
         SHOW_PROGRESS
         HTTPHEADER "Cookie: steamLoginSecure=$ENV{STEAM_LOGIN_SECURE}"
@@ -19,8 +23,11 @@ if(NOT EXISTS ${CMAKE_BINARY_DIR}/external/steamworks_sdk_${SWSDK_VERSION}.zip)
 
     list(GET status 0 status_code)
     if(NOT status_code EQUAL 0)
+        file(REMOVE ${_swsdk_zip_part})
         message(FATAL_ERROR "Download failed: ${status}")
     endif()
+
+    file(RENAME ${_swsdk_zip_part} ${_swsdk_zip})
 endif()
 
 if(NOT EXISTS ${CMAKE_BINARY_DIR}/external/steamworks_sdk_${SWSDK_VERSION})

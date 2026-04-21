@@ -4,6 +4,9 @@ include(CMakeFindDependencyMacro)
 
 set_and_check(STEAMWORKS_INCLUDE_DIR "@PACKAGE_CMAKE_INSTALL_INCLUDEDIR@")
 set_and_check(STEAMWORKS_LIB_DIR "@PACKAGE_CMAKE_INSTALL_LIBDIR@")
+if(WIN32)
+    set_and_check(STEAMWORKS_BIN_DIR "@PACKAGE_CMAKE_INSTALL_BINDIR@")
+endif()
 
 if(NOT TARGET Steamworks::API)
     add_library(Steamworks::API SHARED IMPORTED)
@@ -15,12 +18,12 @@ if(NOT TARGET Steamworks::API)
     if(WIN32)
         if(CMAKE_SIZEOF_VOID_P EQUAL 8)
             set_target_properties(Steamworks::API PROPERTIES
-                IMPORTED_LOCATION "${STEAMWORKS_LIB_DIR}/steam_api64.dll"
+                IMPORTED_LOCATION "${STEAMWORKS_BIN_DIR}/steam_api64.dll"
                 IMPORTED_IMPLIB "${STEAMWORKS_LIB_DIR}/steam_api64.lib"
             )
         else()
             set_target_properties(Steamworks::API PROPERTIES
-                IMPORTED_LOCATION "${STEAMWORKS_LIB_DIR}/steam_api.dll"
+                IMPORTED_LOCATION "${STEAMWORKS_BIN_DIR}/steam_api.dll"
                 IMPORTED_IMPLIB "${STEAMWORKS_LIB_DIR}/steam_api.lib"
             )
         endif()
@@ -45,12 +48,12 @@ if(NOT TARGET Steamworks::EncryptedAppTicket)
     if(WIN32)
         if(CMAKE_SIZEOF_VOID_P EQUAL 8)
             set_target_properties(Steamworks::EncryptedAppTicket PROPERTIES
-                IMPORTED_LOCATION "${STEAMWORKS_LIB_DIR}/sdkencryptedappticket64.dll"
+                IMPORTED_LOCATION "${STEAMWORKS_BIN_DIR}/sdkencryptedappticket64.dll"
                 IMPORTED_IMPLIB "${STEAMWORKS_LIB_DIR}/sdkencryptedappticket64.lib"
             )
         else()
             set_target_properties(Steamworks::EncryptedAppTicket PROPERTIES
-                IMPORTED_LOCATION "${STEAMWORKS_LIB_DIR}/sdkencryptedappticket.dll"
+                IMPORTED_LOCATION "${STEAMWORKS_BIN_DIR}/sdkencryptedappticket.dll"
                 IMPORTED_IMPLIB "${STEAMWORKS_LIB_DIR}/sdkencryptedappticket.lib"
             )
         endif()

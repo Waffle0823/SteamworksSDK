@@ -107,22 +107,31 @@ endif()
 include(CMakePackageConfigHelpers)
 include(GNUInstallDirs)
 
-install(TARGETS steamworks_api steamworks_encrypted_app_ticket
-    EXPORT SteamworksSDKTargets
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-)
+set(_sw_runtime_files "")
+set(_sw_library_files "")
+
+if(WIN32)
+    list(APPEND _sw_runtime_files "${STEAMWORKS_LIBRARY}" "${STEAMWORKS_EAT_LIBRARY}")
+    list(APPEND _sw_library_files "${STEAMWORKS_IMPLIB}" "${STEAMWORKS_EAT_IMPLIB}")
+else()
+    list(APPEND _sw_library_files "${STEAMWORKS_LIBRARY}" "${STEAMWORKS_EAT_LIBRARY}")
+endif()
+
+if(_sw_runtime_files)
+    install(FILES ${_sw_runtime_files}
+        DESTINATION ${CMAKE_INSTALL_BINDIR}
+    )
+endif()
+
+if(_sw_library_files)
+    install(FILES ${_sw_library_files}
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    )
+endif()
 
 install(DIRECTORY "${STEAMWORKS_INCLUDE_DIR}/steam"
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
     FILES_MATCHING PATTERN "*.h"
-)
-
-install(EXPORT SteamworksSDKTargets
-    FILE SteamworksSDKTargets.cmake
-    NAMESPACE Steamworks::
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/SteamworksSDK
 )
 
 write_basic_package_version_file(
@@ -135,6 +144,10 @@ configure_package_config_file(
     "${CMAKE_CURRENT_SOURCE_DIR}/cmake/SteamworksSDKConfig.cmake.in"
     "${CMAKE_CURRENT_BINARY_DIR}/SteamworksSDKConfig.cmake"
     INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/SteamworksSDK
+    PATH_VARS
+        CMAKE_INSTALL_INCLUDEDIR
+        CMAKE_INSTALL_LIBDIR
+        CMAKE_INSTALL_BINDIR
 )
 
 install(FILES
@@ -143,6 +156,9 @@ install(FILES
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/SteamworksSDK
 )
 
-set(STEAMWORKS_API_LIBRARY ${STEAMWORKS_LIBRARY} PARENT_SCOPE)
-set(STEAMWORKS_EAT_LIBRARY ${STEAMWORKS_EAT_LIBRARY} PARENT_SCOPE)
-set(STEAMWORKS_INCLUDE_DIR ${STEAMWORKS_INCLUDE_DIR} PARENT_SCOPE)
+get_directory_property(_sw_has_parent PARENT_DIRECTORY)
+if(_sw_has_parent)
+    set(STEAMWORKS_API_LIBRARY ${STEAMWORKS_LIBRARY} PARENT_SCOPE)
+    set(STEAMWORKS_EAT_LIBRARY ${STEAMWORKS_EAT_LIBRARY} PARENT_SCOPE)
+    set(STEAMWORKS_INCLUDE_DIR ${STEAMWORKS_INCLUDE_DIR} PARENT_SCOPE)
+endif()
