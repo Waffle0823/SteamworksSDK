@@ -5,7 +5,7 @@ option(STEAMWORKS_DOWNLOAD_SDK "Download Steamworks SDK automatically" ON)
 
 if(STEAMWORKS_DOWNLOAD_SDK)
     include(cmake/DownloadSDK.cmake)
-    set(STEAMWORKS_SDK_ROOT "${CMAKE_BINARY_DIR}/external/steamworks_sdk/sdk")
+    set(STEAMWORKS_SDK_ROOT "${CMAKE_BINARY_DIR}/external/steamworks_sdk_${SWSDK_VERSION}/sdk")
 else()
     if(NOT DEFINED STEAMWORKS_SDK_ROOT)
         message(FATAL_ERROR "STEAMWORKS_SDK_ROOT must be defined when STEAMWORKS_DOWNLOAD_SDK is OFF")
