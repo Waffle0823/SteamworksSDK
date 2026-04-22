@@ -70,4 +70,15 @@ endif()
 
 include("${CMAKE_CURRENT_LIST_DIR}/SteamworksSDKHelpers.cmake")
 
+set(_sw_runtime_files "")
+foreach(_sw_target Steamworks::API Steamworks::EncryptedAppTicket)
+    if(TARGET ${_sw_target})
+        get_target_property(_sw_loc ${_sw_target} IMPORTED_LOCATION)
+        if(_sw_loc)
+            list(APPEND _sw_runtime_files "${_sw_loc}")
+        endif()
+    endif()
+endforeach()
+_steamworks_auto_copy_runtime(${_sw_runtime_files})
+
 check_required_components(SteamworksSDK)
