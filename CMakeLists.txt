@@ -31,7 +31,7 @@ if(WIN32)
         set(STEAMWORKS_LIBRARY "${STEAMWORKS_LIB_DIR}/steam_api.dll")
         set(STEAMWORKS_IMPLIB "${STEAMWORKS_LIB_DIR}/steam_api.lib")
     endif()
-    
+
     set_target_properties(steamworks_api PROPERTIES
         IMPORTED_LOCATION "${STEAMWORKS_LIBRARY}"
         IMPORTED_IMPLIB "${STEAMWORKS_IMPLIB}"
@@ -39,7 +39,7 @@ if(WIN32)
 elseif(APPLE)
     set(STEAMWORKS_LIB_DIR "${STEAMWORKS_SDK_ROOT}/redistributable_bin/osx")
     set(STEAMWORKS_LIBRARY "${STEAMWORKS_LIB_DIR}/libsteam_api.dylib")
-    
+
     set_target_properties(steamworks_api PROPERTIES
         IMPORTED_LOCATION "${STEAMWORKS_LIBRARY}"
     )
@@ -51,9 +51,9 @@ elseif(UNIX)
     else()
         set(STEAMWORKS_LIB_DIR "${STEAMWORKS_SDK_ROOT}/redistributable_bin/linux32")
     endif()
-    
+
     set(STEAMWORKS_LIBRARY "${STEAMWORKS_LIB_DIR}/libsteam_api.so")
-    
+
     set_target_properties(steamworks_api PROPERTIES
         IMPORTED_LOCATION "${STEAMWORKS_LIBRARY}"
     )
@@ -76,7 +76,7 @@ if(WIN32)
         set(STEAMWORKS_EAT_LIBRARY "${STEAMWORKS_EAT_LIB_DIR}/sdkencryptedappticket.dll")
         set(STEAMWORKS_EAT_IMPLIB "${STEAMWORKS_EAT_LIB_DIR}/sdkencryptedappticket.lib")
     endif()
-    
+
     set_target_properties(steamworks_encrypted_app_ticket PROPERTIES
         IMPORTED_LOCATION "${STEAMWORKS_EAT_LIBRARY}"
         IMPORTED_IMPLIB "${STEAMWORKS_EAT_IMPLIB}"
@@ -84,7 +84,7 @@ if(WIN32)
 elseif(APPLE)
     set(STEAMWORKS_EAT_LIB_DIR "${STEAMWORKS_SDK_ROOT}/public/steam/lib/osx")
     set(STEAMWORKS_EAT_LIBRARY "${STEAMWORKS_EAT_LIB_DIR}/libsdkencryptedappticket.dylib")
-    
+
     set_target_properties(steamworks_encrypted_app_ticket PROPERTIES
         IMPORTED_LOCATION "${STEAMWORKS_EAT_LIBRARY}"
     )
@@ -96,67 +96,15 @@ elseif(UNIX)
     else()
         set(STEAMWORKS_EAT_LIB_DIR "${STEAMWORKS_SDK_ROOT}/public/steam/lib/linux32")
     endif()
-    
+
     set(STEAMWORKS_EAT_LIBRARY "${STEAMWORKS_EAT_LIB_DIR}/libsdkencryptedappticket.so")
-    
+
     set_target_properties(steamworks_encrypted_app_ticket PROPERTIES
         IMPORTED_LOCATION "${STEAMWORKS_EAT_LIBRARY}"
     )
 endif()
 
-include(CMakePackageConfigHelpers)
-include(GNUInstallDirs)
 include(${CMAKE_CURRENT_LIST_DIR}/cmake/SteamworksSDKHelpers.cmake)
-
-set(_sw_runtime_files "")
-set(_sw_library_files "")
-
-if(WIN32)
-    list(APPEND _sw_runtime_files "${STEAMWORKS_LIBRARY}" "${STEAMWORKS_EAT_LIBRARY}")
-    list(APPEND _sw_library_files "${STEAMWORKS_IMPLIB}" "${STEAMWORKS_EAT_IMPLIB}")
-else()
-    list(APPEND _sw_library_files "${STEAMWORKS_LIBRARY}" "${STEAMWORKS_EAT_LIBRARY}")
-endif()
-
-if(_sw_runtime_files)
-    install(FILES ${_sw_runtime_files}
-        DESTINATION ${CMAKE_INSTALL_BINDIR}
-    )
-endif()
-
-if(_sw_library_files)
-    install(FILES ${_sw_library_files}
-        DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    )
-endif()
-
-install(DIRECTORY "${STEAMWORKS_INCLUDE_DIR}/steam"
-    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-    FILES_MATCHING PATTERN "*.h"
-)
-
-write_basic_package_version_file(
-    "${CMAKE_CURRENT_BINARY_DIR}/SteamworksSDKConfigVersion.cmake"
-    VERSION ${PROJECT_VERSION}
-    COMPATIBILITY SameMajorVersion
-)
-
-configure_package_config_file(
-    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/SteamworksSDKConfig.cmake.in"
-    "${CMAKE_CURRENT_BINARY_DIR}/SteamworksSDKConfig.cmake"
-    INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/SteamworksSDK
-    PATH_VARS
-        CMAKE_INSTALL_INCLUDEDIR
-        CMAKE_INSTALL_LIBDIR
-        CMAKE_INSTALL_BINDIR
-)
-
-install(FILES
-    "${CMAKE_CURRENT_BINARY_DIR}/SteamworksSDKConfig.cmake"
-    "${CMAKE_CURRENT_BINARY_DIR}/SteamworksSDKConfigVersion.cmake"
-    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/SteamworksSDKHelpers.cmake"
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/SteamworksSDK
-)
 
 get_directory_property(_sw_has_parent PARENT_DIRECTORY)
 if(_sw_has_parent)
