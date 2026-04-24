@@ -1,5 +1,5 @@
 # SteamworksSDK
-CI builds of Steamworks SDK for CMake build systems.
+CMake integration for Valve's Steamworks SDK.
 
 ## Usage
 
