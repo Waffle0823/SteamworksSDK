@@ -1,11 +1,14 @@
 cmake_minimum_required(VERSION 3.15)
 project(SteamworksSDK VERSION 1.64.0 LANGUAGES CXX)
 
+include(${CMAKE_CURRENT_LIST_DIR}/cmake/SteamworksSDKHelpers.cmake)
+
 option(STEAMWORKS_DOWNLOAD_SDK "Download Steamworks SDK automatically" ON)
+set(SWSDK_VERSION "164" CACHE STRING "Steamworks SDK version to download")
+set(SWSDK_LINK "https://partner.steamgames.com/downloads/steamworks_sdk_${SWSDK_VERSION}.zip" CACHE STRING "Steamworks SDK download link")
 
 if(STEAMWORKS_DOWNLOAD_SDK)
-    include(cmake/DownloadSDK.cmake)
-    set(STEAMWORKS_SDK_ROOT "${CMAKE_BINARY_DIR}/external/steamworks_sdk_${SWSDK_VERSION}/sdk")
+    _steamworks_download_sdk(STEAMWORKS_SDK_ROOT)
 else()
     if(NOT DEFINED STEAMWORKS_SDK_ROOT)
         message(FATAL_ERROR "STEAMWORKS_SDK_ROOT must be defined when STEAMWORKS_DOWNLOAD_SDK is OFF")
@@ -103,8 +106,6 @@ elseif(UNIX)
         IMPORTED_LOCATION "${STEAMWORKS_EAT_LIBRARY}"
     )
 endif()
-
-include(${CMAKE_CURRENT_LIST_DIR}/cmake/SteamworksSDKHelpers.cmake)
 
 get_directory_property(_sw_has_parent PARENT_DIRECTORY)
 if(_sw_has_parent)
