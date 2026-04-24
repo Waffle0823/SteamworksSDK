@@ -58,6 +58,13 @@ cmake -B build \
 - **`Steamworks::EncryptedAppTicket`**: the `sdkencryptedappticket` shared
   library and headers.
 
+### Supported platforms
+
+- **Windows**: x86 (32-bit) and x64 (64-bit)
+- **Linux**: x86 (32-bit), x64 (64-bit), and ARM64
+- **macOS**: Universal binary
+- **Android**: ARM64 (arm64-v8a ABI)
+
 ## SDK Documentation
 
 SDK documentation can be found here: https://partner.steamgames.com/doc/sdk
