@@ -12,10 +12,10 @@ else()
     endif()
 endif()
 
+set(STEAMWORKS_INCLUDE_DIR "${STEAMWORKS_SDK_ROOT}/public")
+
 add_library(steamworks_api SHARED IMPORTED GLOBAL)
 add_library(Steamworks::API ALIAS steamworks_api)
-
-set(STEAMWORKS_INCLUDE_DIR "${STEAMWORKS_SDK_ROOT}/public")
 
 set_target_properties(steamworks_api PROPERTIES
     INTERFACE_INCLUDE_DIRECTORIES "${STEAMWORKS_INCLUDE_DIR}"

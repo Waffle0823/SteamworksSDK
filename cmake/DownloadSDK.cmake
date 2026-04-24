@@ -2,7 +2,8 @@ if(NOT DEFINED ENV{STEAM_LOGIN_SECURE})
     message(FATAL_ERROR "STEAM_LOGIN_SECURE env var must be set")
 endif()
 
-set(SWSDK_LINK "https://partner.steamgames.com/downloads/steamworks_sdk_164.zip" CACHE STRING "Steamworks SDK download link")
+set(SWSDK_VERSION "164" CACHE STRING "Steamworks SDK version to download")
+set(SWSDK_LINK "https://partner.steamgames.com/downloads/steamworks_sdk_${SWSDK_VERSION}.zip" CACHE STRING "Steamworks SDK download link")
 
 set(_swsdk_zip "${CMAKE_BINARY_DIR}/external/steamworks_sdk_${SWSDK_VERSION}.zip")
 
