@@ -49,7 +49,6 @@ cmake -B build \
 - **`STEAMWORKS_DOWNLOAD_SDK`** (default `ON`): download the SDK automatically.
 - **`STEAMWORKS_SDK_ROOT`**: path to an existing SDK (required when
   `STEAMWORKS_DOWNLOAD_SDK=OFF`).
-- **`SWSDK_VERSION`** (default `164`): Steamworks SDK version to download.
 - **`SWSDK_LINK`**: override the download URL.
 
 ### Exported targets
