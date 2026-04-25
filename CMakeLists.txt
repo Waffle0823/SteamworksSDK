@@ -59,15 +59,25 @@ endif()
 add_library(steamworks_api INTERFACE)
 add_library(Steamworks::API ALIAS steamworks_api)
 
+include(GNUInstallDirs)
+
 target_include_directories(steamworks_api INTERFACE
     $<BUILD_INTERFACE:${STEAMWORKS_INCLUDE_DIR}>
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 
 if(WIN32)
-    target_link_libraries(steamworks_api INTERFACE "${STEAMWORKS_IMPLIB}")
+    get_filename_component(_steamworks_api_link_name "${STEAMWORKS_IMPLIB}" NAME)
+    target_link_libraries(steamworks_api INTERFACE
+        "$<BUILD_INTERFACE:${STEAMWORKS_IMPLIB}>"
+        "$<INSTALL_INTERFACE:$<INSTALL_PREFIX>/${CMAKE_INSTALL_LIBDIR}/${_steamworks_api_link_name}>"
+    )
 else()
-    target_link_libraries(steamworks_api INTERFACE "${STEAMWORKS_LIBRARY}")
+    get_filename_component(_steamworks_api_link_name "${STEAMWORKS_LIBRARY}" NAME)
+    target_link_libraries(steamworks_api INTERFACE
+        "$<BUILD_INTERFACE:${STEAMWORKS_LIBRARY}>"
+        "$<INSTALL_INTERFACE:$<INSTALL_PREFIX>/${CMAKE_INSTALL_BINDIR}/${_steamworks_api_link_name}>"
+    )
 endif()
 
 if(ANDROID)
@@ -111,9 +121,17 @@ target_include_directories(steamworks_encrypted_app_ticket INTERFACE
 )
 
 if(WIN32)
-    target_link_libraries(steamworks_encrypted_app_ticket INTERFACE "${STEAMWORKS_EAT_IMPLIB}")
+    get_filename_component(_steamworks_eat_link_name "${STEAMWORKS_EAT_IMPLIB}" NAME)
+    target_link_libraries(steamworks_encrypted_app_ticket INTERFACE
+        "$<BUILD_INTERFACE:${STEAMWORKS_EAT_IMPLIB}>"
+        "$<INSTALL_INTERFACE:$<INSTALL_PREFIX>/${CMAKE_INSTALL_LIBDIR}/${_steamworks_eat_link_name}>"
+    )
 else()
-    target_link_libraries(steamworks_encrypted_app_ticket INTERFACE "${STEAMWORKS_EAT_LIBRARY}")
+    get_filename_component(_steamworks_eat_link_name "${STEAMWORKS_EAT_LIBRARY}" NAME)
+    target_link_libraries(steamworks_encrypted_app_ticket INTERFACE
+        "$<BUILD_INTERFACE:${STEAMWORKS_EAT_LIBRARY}>"
+        "$<INSTALL_INTERFACE:$<INSTALL_PREFIX>/${CMAKE_INSTALL_BINDIR}/${_steamworks_eat_link_name}>"
+    )
 endif()
 
 get_directory_property(_sw_has_parent PARENT_DIRECTORY)
