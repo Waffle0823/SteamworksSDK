@@ -80,58 +80,53 @@ else()
     )
 endif()
 
-if(ANDROID)
-    if(ANDROID_ABI STREQUAL "arm64-v8a")
-        set(STEAMWORKS_EAT_LIB_DIR "${STEAMWORKS_SDK_ROOT}/public/steam/lib/androidarm64")
-    else()
-        message(FATAL_ERROR "Unsupported Android ABI: ${ANDROID_ABI}. Only arm64-v8a is supported.")
-    endif()
-    set(STEAMWORKS_EAT_LIBRARY "${STEAMWORKS_EAT_LIB_DIR}/libsdkencryptedappticket.so")
-elseif(WIN32)
-    if(CMAKE_SIZEOF_VOID_P EQUAL 8)
-        set(STEAMWORKS_EAT_LIB_DIR "${STEAMWORKS_SDK_ROOT}/public/steam/lib/win64")
-        set(STEAMWORKS_EAT_LIBRARY "${STEAMWORKS_EAT_LIB_DIR}/sdkencryptedappticket64.dll")
-        set(STEAMWORKS_EAT_IMPLIB "${STEAMWORKS_EAT_LIB_DIR}/sdkencryptedappticket64.lib")
-    else()
-        set(STEAMWORKS_EAT_LIB_DIR "${STEAMWORKS_SDK_ROOT}/public/steam/lib/win32")
-        set(STEAMWORKS_EAT_LIBRARY "${STEAMWORKS_EAT_LIB_DIR}/sdkencryptedappticket.dll")
-        set(STEAMWORKS_EAT_IMPLIB "${STEAMWORKS_EAT_LIB_DIR}/sdkencryptedappticket.lib")
-    endif()
-elseif(APPLE)
-    set(STEAMWORKS_EAT_LIB_DIR "${STEAMWORKS_SDK_ROOT}/public/steam/lib/osx")
-    set(STEAMWORKS_EAT_LIBRARY "${STEAMWORKS_EAT_LIB_DIR}/libsdkencryptedappticket.dylib")
-elseif(UNIX)
-    if(CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64|arm64")
-        set(STEAMWORKS_EAT_LIB_DIR "${STEAMWORKS_SDK_ROOT}/public/steam/lib/linuxarm64")
-    elseif(CMAKE_SIZEOF_VOID_P EQUAL 8)
-        set(STEAMWORKS_EAT_LIB_DIR "${STEAMWORKS_SDK_ROOT}/public/steam/lib/linux64")
-    else()
-        set(STEAMWORKS_EAT_LIB_DIR "${STEAMWORKS_SDK_ROOT}/public/steam/lib/linux32")
+if(NOT ANDROID)
+    if(WIN32)
+        if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+            set(STEAMWORKS_EAT_LIB_DIR "${STEAMWORKS_SDK_ROOT}/public/steam/lib/win64")
+            set(STEAMWORKS_EAT_LIBRARY "${STEAMWORKS_EAT_LIB_DIR}/sdkencryptedappticket64.dll")
+            set(STEAMWORKS_EAT_IMPLIB "${STEAMWORKS_EAT_LIB_DIR}/sdkencryptedappticket64.lib")
+        else()
+            set(STEAMWORKS_EAT_LIB_DIR "${STEAMWORKS_SDK_ROOT}/public/steam/lib/win32")
+            set(STEAMWORKS_EAT_LIBRARY "${STEAMWORKS_EAT_LIB_DIR}/sdkencryptedappticket.dll")
+            set(STEAMWORKS_EAT_IMPLIB "${STEAMWORKS_EAT_LIB_DIR}/sdkencryptedappticket.lib")
+        endif()
+    elseif(APPLE)
+        set(STEAMWORKS_EAT_LIB_DIR "${STEAMWORKS_SDK_ROOT}/public/steam/lib/osx")
+        set(STEAMWORKS_EAT_LIBRARY "${STEAMWORKS_EAT_LIB_DIR}/libsdkencryptedappticket.dylib")
+    elseif(UNIX)
+        if(CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64|arm64")
+            set(STEAMWORKS_EAT_LIB_DIR "${STEAMWORKS_SDK_ROOT}/public/steam/lib/linuxarm64")
+        elseif(CMAKE_SIZEOF_VOID_P EQUAL 8)
+            set(STEAMWORKS_EAT_LIB_DIR "${STEAMWORKS_SDK_ROOT}/public/steam/lib/linux64")
+        else()
+            set(STEAMWORKS_EAT_LIB_DIR "${STEAMWORKS_SDK_ROOT}/public/steam/lib/linux32")
+        endif()
+
+        set(STEAMWORKS_EAT_LIBRARY "${STEAMWORKS_EAT_LIB_DIR}/libsdkencryptedappticket.so")
     endif()
 
-    set(STEAMWORKS_EAT_LIBRARY "${STEAMWORKS_EAT_LIB_DIR}/libsdkencryptedappticket.so")
-endif()
+    add_library(steamworks_encrypted_app_ticket INTERFACE)
+    add_library(Steamworks::EncryptedAppTicket ALIAS steamworks_encrypted_app_ticket)
 
-add_library(steamworks_encrypted_app_ticket INTERFACE)
-add_library(Steamworks::EncryptedAppTicket ALIAS steamworks_encrypted_app_ticket)
-
-target_include_directories(steamworks_encrypted_app_ticket INTERFACE
-    $<BUILD_INTERFACE:${STEAMWORKS_INCLUDE_DIR}>
-    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
-)
-
-if(WIN32)
-    get_filename_component(_steamworks_eat_link_name "${STEAMWORKS_EAT_IMPLIB}" NAME)
-    target_link_libraries(steamworks_encrypted_app_ticket INTERFACE
-        "$<BUILD_INTERFACE:${STEAMWORKS_EAT_IMPLIB}>"
-        "$<INSTALL_INTERFACE:$<INSTALL_PREFIX>/${CMAKE_INSTALL_LIBDIR}/${_steamworks_eat_link_name}>"
+    target_include_directories(steamworks_encrypted_app_ticket INTERFACE
+        $<BUILD_INTERFACE:${STEAMWORKS_INCLUDE_DIR}>
+        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
     )
-else()
-    get_filename_component(_steamworks_eat_link_name "${STEAMWORKS_EAT_LIBRARY}" NAME)
-    target_link_libraries(steamworks_encrypted_app_ticket INTERFACE
-        "$<BUILD_INTERFACE:${STEAMWORKS_EAT_LIBRARY}>"
-        "$<INSTALL_INTERFACE:$<INSTALL_PREFIX>/${CMAKE_INSTALL_BINDIR}/${_steamworks_eat_link_name}>"
-    )
+
+    if(WIN32)
+        get_filename_component(_steamworks_eat_link_name "${STEAMWORKS_EAT_IMPLIB}" NAME)
+        target_link_libraries(steamworks_encrypted_app_ticket INTERFACE
+            "$<BUILD_INTERFACE:${STEAMWORKS_EAT_IMPLIB}>"
+            "$<INSTALL_INTERFACE:$<INSTALL_PREFIX>/${CMAKE_INSTALL_LIBDIR}/${_steamworks_eat_link_name}>"
+        )
+    else()
+        get_filename_component(_steamworks_eat_link_name "${STEAMWORKS_EAT_LIBRARY}" NAME)
+        target_link_libraries(steamworks_encrypted_app_ticket INTERFACE
+            "$<BUILD_INTERFACE:${STEAMWORKS_EAT_LIBRARY}>"
+            "$<INSTALL_INTERFACE:$<INSTALL_PREFIX>/${CMAKE_INSTALL_BINDIR}/${_steamworks_eat_link_name}>"
+        )
+    endif()
 endif()
 
 get_directory_property(_sw_has_parent PARENT_DIRECTORY)
@@ -160,17 +155,23 @@ if(WIN32)
     )
 endif()
 
-install(FILES "${STEAMWORKS_EAT_LIBRARY}"
-    DESTINATION ${CMAKE_INSTALL_BINDIR}
-)
+set(_steamworks_install_targets steamworks_api)
 
-if(WIN32)
-    install(FILES "${STEAMWORKS_EAT_IMPLIB}"
-        DESTINATION ${CMAKE_INSTALL_LIBDIR}
+if(NOT ANDROID)
+    install(FILES "${STEAMWORKS_EAT_LIBRARY}"
+        DESTINATION ${CMAKE_INSTALL_BINDIR}
     )
+
+    if(WIN32)
+        install(FILES "${STEAMWORKS_EAT_IMPLIB}"
+            DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        )
+    endif()
+
+    list(APPEND _steamworks_install_targets steamworks_encrypted_app_ticket)
 endif()
 
-install(TARGETS steamworks_api steamworks_encrypted_app_ticket
+install(TARGETS ${_steamworks_install_targets}
     EXPORT SteamworksSDKTargets
     INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
