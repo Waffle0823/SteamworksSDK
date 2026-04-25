@@ -44,17 +44,20 @@ function(_steamworks_download_sdk OUT_SDK_ROOT)
         file(RENAME ${_swsdk_archive_part} ${_swsdk_archive})
     endif()
 
-    if(NOT EXISTS ${_swsdk_extract_dir})
+    if(NOT EXISTS "${_swsdk_extract_dir}/sdk")
         message(STATUS "Extracting SteamWorks SDK")
 
         file(ARCHIVE_EXTRACT INPUT ${_swsdk_archive} DESTINATION ${_swsdk_extract_dir})
+
+        if(STEAMWORKS_USE_SDK_MIRROR)
+            file(RENAME
+                "${_swsdk_extract_dir}/SteamworksSDK-Mirror-${SWSDK_VERSION}"
+                "${_swsdk_extract_dir}/sdk"
+            )
+        endif()
     endif()
 
-    if(STEAMWORKS_USE_SDK_MIRROR)
-        set(${OUT_SDK_ROOT} "${_swsdk_extract_dir}/SteamworksSDK-Mirror-${SWSDK_VERSION}" PARENT_SCOPE)
-    else()
-        set(${OUT_SDK_ROOT} "${_swsdk_extract_dir}/sdk" PARENT_SCOPE)
-    endif()
+    set(${OUT_SDK_ROOT} "${_swsdk_extract_dir}/sdk" PARENT_SCOPE)
 endfunction()
 
 function(_steamworks_auto_copy_runtime)
