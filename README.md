@@ -23,13 +23,21 @@ target_link_libraries(my_game PRIVATE Steamworks::API)
 # target_link_libraries(my_game PRIVATE Steamworks::EncryptedAppTicket)
 ```
 
-Because the SDK is not publicly redistributable, the download step requires a
-valid `steamLoginSecure` cookie from a Steamworks partner account. Export it
-before configuring CMake:
+By default the SDK is fetched from a public mirror, so no authentication is
+required:
+
+```sh
+cmake -B build
+cmake --build build
+```
+
+If you disable the mirror (`-DSTEAMWORKS_USE_SDK_MIRROR=OFF`) the SDK is
+downloaded directly from Steamworks, which requires a valid `steamLoginSecure`
+cookie from a Steamworks partner account. Export it before configuring CMake:
 
 ```sh
 export STEAM_LOGIN_SECURE="<your steamLoginSecure cookie>"
-cmake -B build
+cmake -B build -DSTEAMWORKS_USE_SDK_MIRROR=OFF
 cmake --build build
 ```
 
@@ -47,10 +55,11 @@ cmake -B build \
 ### Options
 
 - **`STEAMWORKS_DOWNLOAD_SDK`** (default `ON`): download the SDK automatically.
+- **`STEAMWORKS_USE_SDK_MIRROR`** (default `ON`): download from the public
+  mirror instead of Steamworks. When `OFF`, `STEAM_LOGIN_SECURE` must be set.
 - **`STEAMWORKS_SDK_ROOT`**: path to an existing SDK (required when
   `STEAMWORKS_DOWNLOAD_SDK=OFF`).
-- **`SWSDK_VERSION`** (default `164`): Steamworks SDK version to download.
-- **`SWSDK_LINK`**: override the download URL.
+- **`SWSDK_VERSION`** (default `1.64`): Steamworks SDK version to download.
 
 ### Exported targets
 

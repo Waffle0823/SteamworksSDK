@@ -1,40 +1,60 @@
 function(_steamworks_download_sdk OUT_SDK_ROOT)
-    if(NOT DEFINED ENV{STEAM_LOGIN_SECURE})
-        message(FATAL_ERROR "STEAM_LOGIN_SECURE env var must be set")
+    if(STEAMWORKS_USE_SDK_MIRROR)
+        set(_swsdk_archive_ext "tar.gz")
+    else()
+        set(_swsdk_archive_ext "zip")
+        if(NOT DEFINED ENV{STEAM_LOGIN_SECURE})
+            message(FATAL_ERROR "STEAM_LOGIN_SECURE env var must be set")
+        endif()
     endif()
 
-    set(_swsdk_zip "${CMAKE_BINARY_DIR}/external/steamworks_sdk_${SWSDK_VERSION}.zip")
+    set(_swsdk_extract_dir "${CMAKE_BINARY_DIR}/external/steamworks_sdk_${SWSDK_VERSION}")
+    set(_swsdk_archive "${_swsdk_extract_dir}.${_swsdk_archive_ext}")
 
-    if(NOT EXISTS ${_swsdk_zip})
+    if(NOT EXISTS ${_swsdk_archive})
         message(STATUS "Downloading SteamWorks SDK version ${SWSDK_VERSION} from ${SWSDK_LINK}")
 
-        set(_swsdk_zip_part "${_swsdk_zip}.part")
+        set(_swsdk_archive_part "${_swsdk_archive}.part")
 
-        file(
-            DOWNLOAD
-            ${SWSDK_LINK}
-            ${_swsdk_zip_part}
-            STATUS status
-            SHOW_PROGRESS
-            HTTPHEADER "Cookie: steamLoginSecure=$ENV{STEAM_LOGIN_SECURE}"
-        )
+        if(STEAMWORKS_USE_SDK_MIRROR)
+            file(
+                DOWNLOAD
+                ${SWSDK_LINK}
+                ${_swsdk_archive_part}
+                STATUS status
+                SHOW_PROGRESS
+            )
+        else()
+            file(
+                DOWNLOAD
+                ${SWSDK_LINK}
+                ${_swsdk_archive_part}
+                STATUS status
+                SHOW_PROGRESS
+                HTTPHEADER "Cookie: steamLoginSecure=$ENV{STEAM_LOGIN_SECURE}"
+            )
+        endif()
 
         list(GET status 0 status_code)
         if(NOT status_code EQUAL 0)
-            file(REMOVE ${_swsdk_zip_part})
+            file(REMOVE ${_swsdk_archive_part})
             message(FATAL_ERROR "Download failed: ${status}")
         endif()
 
-        file(RENAME ${_swsdk_zip_part} ${_swsdk_zip})
+        file(RENAME ${_swsdk_archive_part} ${_swsdk_archive})
     endif()
 
-    if(NOT EXISTS ${CMAKE_BINARY_DIR}/external/steamworks_sdk_${SWSDK_VERSION})
+    if(NOT EXISTS ${_swsdk_extract_dir})
         message(STATUS "Extracting SteamWorks SDK")
 
-        file(ARCHIVE_EXTRACT INPUT ${CMAKE_BINARY_DIR}/external/steamworks_sdk_${SWSDK_VERSION}.zip DESTINATION ${CMAKE_BINARY_DIR}/external/steamworks_sdk_${SWSDK_VERSION})
+        file(ARCHIVE_EXTRACT INPUT ${_swsdk_archive} DESTINATION ${_swsdk_extract_dir})
     endif()
 
-    set(${OUT_SDK_ROOT} "${CMAKE_BINARY_DIR}/external/steamworks_sdk_${SWSDK_VERSION}/sdk" PARENT_SCOPE)
+    if(STEAMWORKS_USE_SDK_MIRROR)
+        set(${OUT_SDK_ROOT} "${_swsdk_extract_dir}/SteamworksSDK-Mirror-${SWSDK_VERSION}" PARENT_SCOPE)
+    else()
+        set(${OUT_SDK_ROOT} "${_swsdk_extract_dir}/sdk" PARENT_SCOPE)
+    endif()
 endfunction()
 
 function(_steamworks_auto_copy_runtime)
